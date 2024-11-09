@@ -1,6 +1,5 @@
 
 class Postings():
-    def __init__(self, docId, tfidf, fields):
+    def __init__(self, docId, tfidf):
         self.docId = docId
         self.tfidf = tfidf
-        self.fields = fields

@@ -1,4 +1,5 @@
-
+from postings import Postings
+from tokenizer import tokenizer, computeWordFrequencies
 class Index(object):
     def __init__(self):
           self.inverted_index = {}
@@ -15,6 +16,7 @@ class Index(object):
                 # retrieve tokens from doc - call getTokens
                 # add tokens to inverted index, increase freq +1 and note doc id
                 # currentDocId += 1
+        
 
 
 
@@ -22,12 +24,14 @@ class Index(object):
     def getTokens(self, docName):
         # get the tokens from the document with their frequency
         # return {token: freq}
+        freq = computeWordFrequencies()
         pass
 
     def logTokens(self, token, docId, frequency):
         # key = token
         # value = (docId, frequency)
         # self.invertex_index[key] array, append value tuple
+        self.inverted_index[token] = Postings(docId, frequency)
         pass
 
     def printReport(self):
