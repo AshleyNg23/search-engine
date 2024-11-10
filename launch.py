@@ -1,6 +1,6 @@
 from indexer import Index
 
-def main(dir_name):
+def main(dir_name ="testFolder"):
     dir_indexer = Index()
     dir_indexer.index(dir_name)
     dir_indexer.printReport()
