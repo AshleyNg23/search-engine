@@ -20,18 +20,20 @@ class Index(object):
                 # retrieve tokens from doc - call getTokens
                 # add tokens to inverted index, increase freq +1 and note doc id
                 # currentDocId += 1
+        print(os.listdir(self.base_directory))
         for folders in os.listdir(self.base_directory):
-            for files in os.listdir(folders):
-                filePath = os.path.join(files)
+            folderPath = os.path.join(self.base_directory, folders)
+            for files in os.listdir(folderPath):
+                filePath = os.path.join(folderPath, files)
                 # Open the HTML file
                 with open(filePath, "r") as file:
                     html_content = file.read()
 
                 # Create a BeautifulSoup object
-                soup = BeautifulSoup(html_content, "lxml")
+                soup = BeautifulSoup(html_content, "html.parser")
 
                 text = soup.get_text()
-                space_delemited_text = re.sub('\s+',' ',text)
+                space_delemited_text = re.sub(r'\s+',' ',text)
 
                 # Now you can use BeautifulSoup methods to extract data from the file
                 # For example, to get all the links:
