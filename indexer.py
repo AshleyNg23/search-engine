@@ -70,8 +70,8 @@ class Index(object):
         pass
 
     def printReport(self):
-         print("Indexed Documents: " + self.currentDocId)
-         print("Unique Tokens: " + self.inverted_index.keys().length())
+         print("Indexed Documents: " + str(self.currentDocId))
+         print("Unique Tokens: " + str(len(self.inverted_index)))
          print("Total Size: ")
          # maybe print top 10 most frequent tokens
          # print the most common document?
