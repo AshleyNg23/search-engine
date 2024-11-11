@@ -8,4 +8,4 @@ def main(dir_name):
 
 
 if __name__ == "__main__":
-    main("F:\developer\DEV")
+    main("DEV")

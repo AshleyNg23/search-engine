@@ -3,6 +3,7 @@ from tokenizer import tokenizer, computeWordFrequencies
 import os
 from bs4 import BeautifulSoup
 import re
+import sys
 
 class Index(object):
     def __init__(self):
@@ -72,6 +73,6 @@ class Index(object):
     def printReport(self):
          print("Indexed Documents: " + str(self.currentDocId))
          print("Unique Tokens: " + str(len(self.inverted_index)))
-         print("Total Size: ")
+         print("Total Size: " + str(sys.getsizeof(self.inverted_index)) + "bytes")
          # maybe print top 10 most frequent tokens
          # print the most common document?
