@@ -1,5 +1,5 @@
 import hashlib
-
+from nltk import PorterStemmer
 
 def tokenizer(listOfWords):
     tokens = []
@@ -25,10 +25,23 @@ def tokenizer(listOfWords):
     "why", "why's", "with", "won't", "would", "wouldn't", "you", "you'd", "you'll",
     "you're", "you've", "your", "yours", "yourself", "yourselves"
     }
-
-    for word in listOfWords.split():
-        if len(word) > 1 and word not in stopWords:
-            tokens.append(word.lower())
+    i = 0
+    fullStr = ""
+    ps = PorterStemmer()
+    while i < len(listOfWords):
+        character = listOfWords[i] # Read character by character
+        if not character:
+            if fullStr != "": # If fullStr has a string, append it to tokens
+                tokens.append(fullStr)
+            fullStr = ""
+            break
+        if not character.isalnum():
+            if fullStr != "" and fullStr not in stopWords and len(fullStr) > 1: # If fullStr is not empty, append it to tokens
+                tokens.append(ps.stem(fullStr))
+            fullStr = "" 
+        else:
+            fullStr += character.lower() # Convert to lowercase for consistency
+        i += 1
     return tokens
 
 def computeWordFrequencies(tokens: list): 
@@ -41,7 +54,6 @@ def computeWordFrequencies(tokens: list):
     tokenMap = {}
     
     for values in tokens:
-        values = bin(int(hashlib.sha256(values.encode()).hexdigest(), 16))[2::]
         if values not in tokenMap:
             tokenMap[values] = 0
         tokenMap[values] += 1
