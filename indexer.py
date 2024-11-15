@@ -11,7 +11,6 @@ import heapq
 class Index(object):
     def __init__(self):
           self.inverted_index = {}
-          # {token_name = [(docId, docFrequency), (1, 7), (2, 3)]}
           self.base_directory = ""
           self.currentDocId = 1
           self.amountOfPartial = 0
@@ -20,13 +19,6 @@ class Index(object):
     def index(self, dir_name):
         chunk = 0
         self.base_directory = dir_name
-         # Loop through all directories in DEV folder 
-         # while theres still directories in the folder
-            # open the directory -> get list of pages in the directory
-            # for each page in the directory
-                # retrieve tokens from doc - call getTokens
-                # add tokens to inverted index, increase freq +1 and note doc id
-                # currentDocId += 1
         for folders in os.listdir(self.base_directory):
             folderPath = os.path.join(self.base_directory, folders)
             for files in os.listdir(folderPath):
@@ -46,7 +38,7 @@ class Index(object):
                 # Iterate through the tokens to log them into our inverted Index O(N) run-time O(N) space comp
                 for key,values in freq.items():
                     self.logTokens(filePath, key, self.currentDocId, values)
-                    self.chunk += 1
+                    chunk += 1
                     if chunk >= self.chunkSize:
                         self.createPartial()
                         chunk = 0
@@ -112,14 +104,6 @@ class Index(object):
             
          
 
-
-
-
-    def getTokens(self, docName):
-        # get the tokens from the document with their frequency
-        # return {token: freq}
-        pass
-
     def logTokens(self, filePath, token, docId, frequency):
         # key = token
         # value = (docId, frequency)
@@ -143,5 +127,3 @@ class Index(object):
             print("Indexed Documents: " + str(self.currentDocId))
             print("Unique Tokens: " + str(len(unique_tokens)))
             print("Total Size: " + str(round((total_size)/1024,2)) + "kb")
-         # maybe print top 10 most frequent tokens
-         # print the most common document?

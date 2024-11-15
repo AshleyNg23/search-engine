@@ -24,4 +24,4 @@ def main(dir_name):
 
 
 if __name__ == "__main__":
-    main("DEV")
+    main("developer")
