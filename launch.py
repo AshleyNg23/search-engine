@@ -1,5 +1,6 @@
 from indexer import Index
 import os
+import time
 
 def deletePartialIndexes(directory):
     # Loop through all files in the given directory
@@ -16,12 +17,16 @@ def deletePartialIndexes(directory):
                 print(f"Error deleting {filePath}: {e}")
 
 def main(dir_name):
+
+    start_time = time.time()
     deletePartialIndexes(os.getcwd())
     print(dir_name)
     dir_indexer = Index()
     dir_indexer.index(dir_name)
     dir_indexer.printReport()
+    deletePartialIndexes(os.getcwd())
+    print("Process finished --- %s seconds ---" % (time.time() - start_time))
 
 
 if __name__ == "__main__":
-    main("DEV")
+    main(r"C:\Users\Rudy1\Downloads\developer\DEV")
