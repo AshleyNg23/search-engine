@@ -1,11 +1,12 @@
 from indexer import Index
 import os
+import pickle
 
 def deletePartialIndexes(directory):
     # Loop through all files in the given directory
     for filename in os.listdir(directory):
         # Check if the file starts with "PartialIndex"
-        if filename.startswith("PartialIndex") or filename.startswith("FinalIndex.pkl"):
+        if filename.startswith("PartialIndex") or filename.startswith("FinalIndex.pkl") or filename.startswith("IndexesWith"):
             # Construct the full file path
             filePath = os.path.join(directory, filename)
             try:
@@ -24,4 +25,4 @@ def main(dir_name):
 
 
 if __name__ == "__main__":
-    main("developer")
+    main(r"C:\Users\Rudy1\Downloads\developer\DEV")

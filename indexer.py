@@ -14,7 +14,7 @@ class Index(object):
           self.base_directory = ""
           self.currentDocId = 1
           self.amountOfPartial = 0
-          self.chunkSize = 100000
+          self.chunkSize = 10000
     
     def index(self, dir_name):
         chunk = 0
@@ -38,10 +38,10 @@ class Index(object):
                 # Iterate through the tokens to log them into our inverted Index O(N) run-time O(N) space comp
                 for key,values in freq.items():
                     self.logTokens(filePath, key, self.currentDocId, values)
-                    chunk += 1
-                    if chunk >= self.chunkSize:
-                        self.createPartial()
-                        chunk = 0
+                chunk += 1
+                if chunk >= self.chunkSize:
+                    self.createPartial()
+                    chunk = 0
                 self.currentDocId += 1
         self.mergePartial()
             
@@ -70,10 +70,12 @@ class Index(object):
         mergedIndex = {}
         currentTerm = None
         currentPostings = []
+        currentLetter = None
                 
         while heap:
             term, fileIndex, postings = heapq.heappop(heap)
-
+            if currentLetter == None:
+                currentLetter = term[0]
             if term == currentTerm:
                 currentPostings.extend(postings)
             else:
@@ -83,10 +85,10 @@ class Index(object):
                 #Keep track of the amount of unique tokens so we don't have to open the file to check.            
                 currentPostings = postings
                 currentTerm = term
-                currentChunk += 1
             
-            if currentChunk >= self.chunkSize:
-                self.dumpFinal(mergedIndex)
+            if currentTerm[0] != currentLetter:
+                self.dumpFinal(currentLetter,mergedIndex)
+                currentLetter = currentTerm[0]
                 mergedIndex.clear()
             
             try:
@@ -94,13 +96,15 @@ class Index(object):
                 heapq.heappush(heap, (nextToken, fileIndex, nextPostings))
             except EOFError:
                 listOfFiles[fileIndex].close()
-        self.dumpFinal(mergedIndex)
+        self.dumpFinal(currentLetter, mergedIndex)
 
 
-    def dumpFinal(self, mergedIndex, fileName = "FinalIndex.pkl"):
+    def dumpFinal(self, curLetter, mergedIndex, fileName = "FinalIndex.pkl"):
+        with open(f"IndexesWith{curLetter}", "wb") as file:
+            pickle.dump(mergedIndex, file)
         with open(fileName, "ab") as file:
-            for token, post in mergedIndex.items():
-                pickle.dump((token, post), file)
+            pickle.dump(mergedIndex,file)
+    
             
          
 
@@ -119,11 +123,13 @@ class Index(object):
         with open("FinalIndex.pkl", "rb") as file:
             while True:
                 try:
-                    token, postings = pickle.load(file)
-                    unique_tokens.add(token)
-                    total_size += sys.getsizeof((token, postings))
+                    pickleFile = pickle.load(file)
+                    for token in pickleFile.keys():
+                        unique_tokens.add(token)
                 except EOFError:
                     break  # End of file reached
             print("Indexed Documents: " + str(self.currentDocId))
             print("Unique Tokens: " + str(len(unique_tokens)))
-            print("Total Size: " + str(round((total_size)/1024,2)) + "kb")
+            fileState = os.stat(file)
+
+            print("Total Size: " + str(round(fileState.st_size/1024,2)) + "kb")
