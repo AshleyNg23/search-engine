@@ -5,3 +5,8 @@ class Postings():
         self.docId = docId
         self.tfidf = tfidf
 
+    def getDocName(self):
+        return self.docName
+    
+    def getDocId(self):
+        return self.docId
