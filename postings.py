@@ -10,3 +10,4 @@ class Postings():
     
     def getDocId(self):
         return self.docId
+    

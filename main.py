@@ -18,8 +18,12 @@ def search():
 def return_results(query):
     # break query into tokens
     search_tokens = query.split(" ");
+    set1={}
+    set1=set(set1)
+    matching_docs=[]
     # keep each posting result in a different index so we can track intersection
-    matching_docs = [[] * len(search_tokens)]
+    for i in range(len(search_tokens)):
+        matching_docs.append(set1)
     with open('FinalIndex.pkl', "rb") as file:
         try:
             while True: 
@@ -30,7 +34,8 @@ def return_results(query):
                     # item can be token or postings, its weird so this is the only way to iterate through our pickle file
                     if token != "":
                         # if the token was found, then item = posting, add to the matched docs list
-                        matching_docs[search_tokens.index(token)].append(item)
+                        for t in item:
+                            matching_docs[search_tokens.index(token)].add((t.docId,t.docName))
                         token = ""
                     if item in search_tokens:
                         # if we found a matching keyword, save the word so we can collect its posting on the next iteration
@@ -39,16 +44,35 @@ def return_results(query):
             contains_all_words = []
             if len(matching_docs) > 1:
                 # TODO: Make this work for queries with more than one word
-                contains_all_words = [
-                    posting for posting in matching_docs
-                    if all(posting.getDocId() in {p.getDocId() for p in all_postings} for all_postings in matching_docs[1:])
-                ]
+                intersect=matching_docs[0]
+                for l in range(1,len(matching_docs)):
+                    intersect=set((intersect) & matching_docs[l])
+                # contains_all_words = [
+                #     posting for posting in matching_docs
+                #     if all(posting.getDocId() in {p.getDocId() for p in all_postings} for all_postings in matching_docs[1:])
+                # ]
                 file.close()
-                return [convert_to_link(p) for p in contains_all_words]
+                if intersect == []:
+                    return {"title": "No Results", "url": "N/A"}
+                results = []
+                for inf in intersect:
+                    url = getUrl(inf[1])
+                    # format title and url for front-end
+                    results.append({"title": f"Doc Id: {inf[0]}", "url": f"{url}"})
+                return results
+                #return [convert_to_link(p) for p in contains_all_words]
             else:
                 file.close()
                 # query was one word, so just convert the single list of postings to link
-                return convert_to_link(matching_docs[0])
+                #return convert_to_link(matching_docs[0])
+                if matching_docs[0] == set({}):
+                    return {"title": "No Results", "url": "N/A"}
+                results = []
+                for inf in matching_docs[0]:
+                    url = getUrl(inf[1])
+                    # format title and url for front-end
+                    results.append({"title": f"Doc Id: {inf[0]}", "url": f"{url}"})
+                return results
 
 def convert_to_link(posting):
     if posting == []:
