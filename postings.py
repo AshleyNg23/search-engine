@@ -11,3 +11,5 @@ class Postings():
     def getDocId(self):
         return self.docId
     
+    def getTfidf(self):
+        return self.tfidf
