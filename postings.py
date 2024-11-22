@@ -27,3 +27,12 @@ class Postings():
     def __hash__(self):
         return hash((self.docId,self.docName))
     
+    def __lt__(self,value):
+        if isinstance(value, Postings):
+            if self.tfidf<value.tfidf:
+                return True
+            elif self.tfidf==value.tfidf:
+                if self.docId>value.docId:
+                    return True
+        else:
+            return False

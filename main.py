@@ -49,55 +49,40 @@ def return_results(query):
                         # if we found a matching keyword, save the word so we can collect its posting on the next iteration
                         token = item
         except EOFError:
-            # contains_all_words = []
-            # if len(matching_docs) > 1:
-            #     # TODO: Make this work for queries with more than one word
-            #     intersect=matching_docs[0]
-            #     for l in range(1,len(matching_docs)):
-            #         intersect=set((intersect) & matching_docs[l])
-            #     # contains_all_words = [
-            #     #     posting for posting in matching_docs
-            #     #     if all(posting.getDocId() in {p.getDocId() for p in all_postings} for all_postings in matching_docs[1:])
-            #     # ]
-            #     file.close()
-            #     if intersect == []:
-            #         return {"title": "No Results", "url": "N/A"}
-            #     results = []
-            #     for inf in intersect:
-            #         url = getUrl(inf[1])
-            #         # format title and url for front-end
-            #         results.append({"title": f"Doc Id: {inf[0]}", "url": f"{url}"})
-            #     return results
-            #     #return [convert_to_link(p) for p in contains_all_words]
-            # else:
-            #     file.close()
-            #     # query was one word, so just convert the single list of postings to link
-            #     #return convert_to_link(matching_docs[0])
-            #     if matching_docs[0] == set({}):
-            #         return {"title": "No Results", "url": "N/A"}
-            #     results = []
-            #     for inf in matching_docs[0]:
-            #         url = getUrl(inf[1])
-            #         # format title and url for front-end
-            #         results.append({"title": f"Doc Id: {inf[0]}", "url": f"{url}"})
-            #     return results
-            intersect = set.intersection(*matching_docs) if len(matching_docs) > 1 else matching_docs[0]
-
-            if not intersect:
-                return [{"title": "No Results", "url": "N/A"}]
-
-            # # sort results by tf idf
-            sorted_results = sorted(intersect, key=lambda p: p.getTfidf(), reverse=True)
-
-            results = []
-            for inf in sorted_results:
-                url = getUrl(inf.getDocName())
-                results.append({
-                    "title": f"Doc Id: {inf.getDocId()} (TF-IDF: {inf.getTfidf():.2f})",
-                    "url": url
-                })
-
-            return results
+            contains_all_words = []
+            if len(matching_docs) > 1:
+                # TODO: Make this work for queries with more than one word
+                intersect=matching_docs[0]
+                for l in range(1,len(matching_docs)):
+                    intersect=set((intersect) & matching_docs[l])
+                # contains_all_words = [
+                #     posting for posting in matching_docs
+                #     if all(posting.getDocId() in {p.getDocId() for p in all_postings} for all_postings in matching_docs[1:])
+                # ]
+                file.close()
+                if intersect == []:
+                    return {"title": "No Results", "url": "N/A"}
+                results = []
+                intersect=sorted(intersect,reverse=True)
+                for inf in intersect:
+                    url = getUrl(inf.getDocName())
+                    # format title and url for front-end
+                    results.append({"title": f"Doc Id: {inf.getDocId()} (TF-IDF: {inf.getTfidf():.2f})","url": url})
+                return results
+                #return [convert_to_link(p) for p in contains_all_words]
+            else:
+                file.close()
+                # query was one word, so just convert the single list of postings to link
+                #return convert_to_link(matching_docs[0])
+                if matching_docs[0] == set({}):
+                    return {"title": "No Results", "url": "N/A"}
+                results = []
+                matching_docs[0]=sorted(matching_docs,reverse=True)
+                for inf in matching_docs[0]:
+                    url = getUrl(inf.getDocName())
+                    # format title and url for front-end
+                    results.append({"title": f"Doc Id: {inf.getDocId()} (TF-IDF: {inf.getTfidf():.2f})","url": url})
+                return results
 
 def convert_to_link(posting):
     if posting == []:
