@@ -14,13 +14,15 @@ class Postings():
     def getTfidf(self):
         return self.tfidf
     
+    def setTfidf(self,value):
+        self.tfidf=value
+    
     def __eq__(self, value):
         if isinstance(value, Postings):
             if self.docName==value.docName and self.docId==value.docId:
-                if self.tfidf>value.tfidf:
-                    self.tfidf=value.tfidf
-                else:
-                    value.tfidf=self.tfidf
+                tf=self.tfidf+value.tfidf
+                value.tfidf=tf
+                self.tfidf=tf
                 return True
         return False
     

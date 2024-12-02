@@ -3,6 +3,7 @@ import pickle
 from postings import Postings
 import json
 from nltk import PorterStemmer
+import math
 
 app = Flask(__name__)
 
@@ -52,9 +53,7 @@ def return_results(query):
             contains_all_words = []
             if len(matching_docs) > 1:
                 # TODO: Make this work for queries with more than one word
-                intersect=matching_docs[0]
-                for l in range(1,len(matching_docs)):
-                    intersect=set((intersect) & matching_docs[l])
+                intersect=tf_idf(matching_docs)
                 # contains_all_words = [
                 #     posting for posting in matching_docs
                 #     if all(posting.getDocId() in {p.getDocId() for p in all_postings} for all_postings in matching_docs[1:])
@@ -100,6 +99,18 @@ def getUrl(docName):
         url = data.get('url')
         docFile.close()
         return url
+
+def tf_idf(matching_docs):
+    for i in matching_docs:
+        for j in i:
+            tf=(1+math.log(j.getTfidf(),10))*math.log(55394/len(i),10)
+            j.setTfidf(tf)
+    union_set=set()
+    for s in matching_docs:
+        union_set=union_set.union(s)
+    return union_set
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)
