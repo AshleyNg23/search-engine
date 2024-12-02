@@ -43,64 +43,130 @@ class Index(object):
                         self.createPartial()
                         chunk = 0
                 self.currentDocId += 1
+        if self.inverted_index:
+                self.createPartial()
         self.mergePartial()
             
     
 
     def createPartial(self):
         with open(f"PartialIndex{self.amountOfPartial}.pkl", "wb") as file:
-            for tokens, postings in sorted(self.inverted_index.items()):
-                pickle.dump((tokens,postings), file)
+            #for tokens, postings in sorted(self.inverted_index.items()):
+            pickle.dump(self.inverted_index, file)
         self.amountOfPartial += 1
         self.inverted_index.clear()
 
     def mergePartial(self):
-        currentChunk = 0
-        listOfFiles = []
-        heap = []
-        for i in range(self.amountOfPartial):
-            file = open(f"PartialIndex{i}.pkl", "rb")
-            listOfFiles.append(file)
-            try:
-                token, postings = pickle.load(file)
-                heapq.heappush(heap, (token, i, postings))
-            except EOFError:
-                file.close()
+        # currentChunk = 0
+        # listOfFiles = []
+        # heap = []
+        # for i in range(self.amountOfPartial):
+        #     file = open(f"PartialIndex{i}.pkl", "rb")
+        #     listOfFiles.append(file)
+        #     try:
+        #         token, postings = pickle.load(file)
+        #         heapq.heappush(heap, (token, i, postings))
+        #     except EOFError:
+        #         file.close()
         
-        mergedIndex = {}
-        currentTerm = None
-        currentPostings = []
+        # mergedIndex = {}
+        # currentTerm = None
+        # currentPostings = []
                 
-        while heap:
-            term, fileIndex, postings = heapq.heappop(heap)
+        # while heap:
+        #     term, fileIndex, postings = heapq.heappop(heap)
 
-            if term == currentTerm:
-                currentPostings.extend(postings)
-            else:
-                if currentTerm != None:
-                    mergedIndex[currentTerm] = currentPostings
+        #     if term == currentTerm:
+        #         currentPostings.extend(postings)
+        #     else:
+        #         if currentTerm != None:
+        #             mergedIndex[currentTerm] = currentPostings
                 
-                #Keep track of the amount of unique tokens so we don't have to open the file to check.            
-                currentPostings = postings
-                currentTerm = term
-                currentChunk += 1
+        #         #Keep track of the amount of unique tokens so we don't have to open the file to check.            
+        #         currentPostings = postings
+        #         currentTerm = term
+        #         currentChunk += 1
             
-            if currentChunk >= self.chunkSize:
-                self.dumpFinal(mergedIndex)
-                mergedIndex.clear()
+        #     if currentChunk >= self.chunkSize:
+        #         self.dumpFinal(mergedIndex)
+        #         mergedIndex.clear()
             
-            try:
-                nextToken, nextPostings = pickle.load(listOfFiles[fileIndex])
-                heapq.heappush(heap, (nextToken, fileIndex, nextPostings))
-            except EOFError:
-                listOfFiles[fileIndex].close()
-        self.dumpFinal(mergedIndex)
+        #     try:
+        #         nextToken, nextPostings = pickle.load(listOfFiles[fileIndex])
+        #         heapq.heappush(heap, (nextToken, fileIndex, nextPostings))
+        #     except EOFError:
+        #         listOfFiles[fileIndex].close()
+        # self.dumpFinal(mergedIndex)
+        index_index={}
+        final={}
+        part=0;
+        number=0;
+        while 1:
+                empty=0
+                decision=1
+                dict_sum={}
+                for index in range(0,self.amountOfPartial):
+                    with open(f"PartialIndex{index}.pkl", "rb") as fi:
+                            loaded_dict = pickle.load(fi)
+                            if decision:
+                                if len(loaded_dict)!=0:
+                                        first_key = next(iter(loaded_dict))
+                                        post=loaded_dict.pop(first_key)
+                                        #print(type(post))
+                                        if first_key in index_index:
+                                            index_index[first_key].extend(post)
+                                        else:
+                                             index_index[first_key]=[]
+                                             index_index[first_key].extend(post)
+                                        # with open('report.txt', 'a') as file:
+                                        #     file.write(f"token: {first_key}, post: {post}")
+                                        #     file.close()
+                                        decision=0
+                                        fi.close()
+                                        os.remove(f"PartialIndex{index}.pkl")
+                                        with open(f"PartialIndex{index}.pkl", "wb") as f:
+                                            pickle.dump(loaded_dict, f)
+                                            f.close()
+                                else:
+                                        empty+=1
+                                        continue
+                            else:
+                                if len(loaded_dict)!=0:
+                                        if first_key in loaded_dict:
+                                            post=loaded_dict.pop(first_key)
+                                            fi.close()
+                                            os.remove(f"PartialIndex{index}.pkl")
+                                            with open(f"PartialIndex{index}.pkl", "wb") as f:
+                                                    pickle.dump(loaded_dict, f)
+                                                    f.close()
+                                            #print(index_index[first_key])
+                                            index_index[first_key].extend(post)
+                                            # with open('report.txt', 'a') as file:
+                                            #         file.write(f", {post}")
+                                            #         file.close()
+                            fi.close()
+                number=number+1
+                final[first_key]=part
+                if number%1000==0:
+                     self.dumpFinal(index_index)
+                     index_index.clear()
+                     part=part+1
+                # with open('report.txt', 'a') as file:
+                #     file.write(f"\n")
+                #     file.close()
+                if empty==self.amountOfPartial:
+                    self.dumpFinal(index_index)
+                    index_index.clear()
+                    with open(f"indexofindex.pkl", "wb") as f:
+                            pickle.dump(final, f)
+                            f.close()
+                    break
 
 
     def dumpFinal(self, mergedIndex, fileName = "FinalIndex.pkl"):
         with open(fileName, "ab") as file:
-            for token, post in mergedIndex.items():
-                pickle.dump((token, post), file)
+            # for token, post in mergedIndex.items():
+            pickle.dump(mergedIndex, file)
             
          
 
@@ -114,16 +180,16 @@ class Index(object):
         pass
 
     def printReport(self):
-        unique_tokens = set()
+        unique_tokens = 0
         total_size = 0
         with open("FinalIndex.pkl", "rb") as file:
-            while True:
+            token= pickle.load(file)
+            for dict1 in token:
                 try:
-                    token, postings = pickle.load(file)
-                    unique_tokens.add(token)
-                    total_size += sys.getsizeof((token, postings))
+                    unique_tokens+=len(dict1)
+                    total_size += sys.getsizeof(dict1)
                 except EOFError:
                     break  # End of file reached
             print("Indexed Documents: " + str(self.currentDocId))
-            print("Unique Tokens: " + str(len(unique_tokens)))
+            print("Unique Tokens: " + str(unique_tokens))
             print("Total Size: " + str(round((total_size)/1024,2)) + "kb")
