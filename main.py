@@ -4,6 +4,8 @@ from postings import Postings
 import json
 from nltk import PorterStemmer
 import math
+import os
+import time
 
 app = Flask(__name__)
 
@@ -12,11 +14,43 @@ app = Flask(__name__)
 def home():
     return render_template('search_home.html')
 
-@app.route('/search', methods=['POST'])
+@app.route('/search', methods=['POST', 'GET'])
 def search():
-    query = request.form['query']
-    results = return_results(query)
-    return render_template('results.html', query=query, results=results, num_results=len(results))
+    query = request.form['query'] if request.method == 'POST' else request.args.get('query', '')  # Handle form and query params
+    page = int(request.args.get('page', 1))  # Get the current page from the query string
+    per_page = 10  # Number of results per page
+
+    start_time = time.time()
+
+    # Get all results based on the query
+    all_results = return_results(query)
+
+    end_time = time.time()
+    elapsed_time = (end_time - start_time) * 1000  # Convert to milliseconds
+
+    # Calculate pagination
+    start = (page - 1) * per_page
+    end = start + per_page
+    paginated_results = all_results[start:end]  # Slice results for pagination
+
+    # Calculate total pages
+    total_pages = math.ceil(len(all_results) / per_page)
+
+    # Debugging output
+    print(start_time, end_time, elapsed_time)
+    print(f'{end_time} - {start_time} = {elapsed_time}')
+
+    # Render the results template with pagination and other info
+    return render_template(
+        'results.html',
+        query=query,
+        results=paginated_results,
+        num_results=len(all_results),
+        elapsed_time=elapsed_time,
+        current_page=page,
+        total_pages=total_pages
+    )
+
 
 def return_results(query):
     ps = PorterStemmer()
@@ -106,6 +140,7 @@ def convert_to_link(posting):
     return results
 
 def getUrl(docName):
+    docName = docName.replace("\\", "/")
     with open(docName, "r") as docFile:
         data = json.load(docFile)
         url = data.get('url')
