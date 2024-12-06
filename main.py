@@ -122,7 +122,7 @@ def return_results(query):
             if matching_docs[0] == set({}):
                 return {"title": "No Results", "url": "N/A"}
             results = []
-            matching_docs[0]=sorted(matching_docs,reverse=True)
+            matching_docs[0]=sorted(matching_docs[0],reverse=True)
             for inf in matching_docs[0]:
                 url = getUrl(inf.getDocName())
                 # format title and url for front-end
