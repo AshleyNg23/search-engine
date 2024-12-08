@@ -35,7 +35,7 @@ def search():
 
 
     end_time = time.time()
-    elapsed_time = (end_time - start_time) * 1000  # Convert to milliseconds
+    elapsed_time = round((end_time - start_time) * 1000, 2)  # Convert to milliseconds
 
 
     # Calculate pagination
@@ -159,7 +159,7 @@ def return_results(query):
         for inf in intersection:
             url = inf.getDocName()
             # format title and url for front-end
-            results.append({"title": f"Doc Id: {inf.getDocId()} (TF-IDF: {inf.getTfidf():.5f})","url": url})
+            results.append({"title": f"Doc Id: {inf.getDocId()} (TF-IDF: {inf.getTfidf():.4f})","url": url})
         return results
     else:
         return [{"title": "No Results", "url": "N/A"}]
