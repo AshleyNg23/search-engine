@@ -45,5 +45,5 @@ def main(dir_name):
 
 
 if __name__ == "__main__":
-    main(r"C:\Users\Rudy1\Downloads\developer\DEV")
+    main("DEV")
 

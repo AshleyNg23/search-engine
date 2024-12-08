@@ -1,5 +1,5 @@
 from postings import Postings
-from tokenizer import tokenizer, computeWordFrequencies, computeSimHashFrequencies, simHash, checkSimilar
+from tokenizer import tokenizer
 import os
 from bs4 import BeautifulSoup
 import re
@@ -7,6 +7,7 @@ import pickle
 import json
 import math
 import heapq
+from collections import defaultdict
 
 
 class Index(object):
@@ -43,36 +44,40 @@ class Index(object):
                 soup = BeautifulSoup(html_content["content"], "lxml")
                 soup1 = BeautifulSoup(html_content["url"],"lxml")
                 text = soup.get_text()
-                space_delemited_text = re.sub(r'\s+',' ',text)
                 #Get url for faster finding in the search
                 url = soup1.get_text()
                 space_delemited_url = re.sub(r'\s+',' ',url)
                 # Now you can use BeautifulSoup methods to extract data from the file
                 # For example, to get all the links:
-
-
-                tokens = tokenizer(space_delemited_text)
-                freq = computeWordFrequencies(tokens)
-
+                word_tag_freq = defaultdict(list)
+                for htmltag in soup.descendants:
+                    if htmltag.name and htmltag.string: 
+                        text = htmltag.get_text()
+                        space_delimited_text = re.sub(r'\s+', ' ', text)
+                        tokens = tokenizer(space_delimited_text)  # Tokenize the text
+                        for token in tokens:
+                            if htmltag.name == "h1" or htmltag.name == "h2" or htmltag.name == "h3" or htmltag.name == "bold" or htmltag.name == "strong" or htmltag.name == "title":
+                                word_tag_freq[token].append(1.25)
+                            else:
+                                word_tag_freq[token].append(1)
 
                 # Duplication/Similiarity Check
                 # Iterate through the tokens to log them into our inverted Index O(N) run-time O(N) space comp
-                for key,values in freq.items():
-                        self.logTokens(filePath, space_delemited_url, key, self.currentDocId, 1 + math.log(values, 10) ,values)
+                for key,tag_weight in word_tag_freq.items():
+                        term_freq = len(tag_weight) 
+                        self.logTokens(filePath, space_delemited_url, key, self.currentDocId, 1 + math.log(term_freq, 10) , max(tag_weight))
                         self.chunk += 1
                         if self.chunk >= self.chunkSize:
                             self.createPartial()
                             self.chunk = 0
                 self.currentDocId += 1
-               
-               
         self.createPartial()
         self.mergePartial()
            
-    def logTokens(self, filePath, url, token, docId, tf, df):
+    def logTokens(self, filePath, url, token, docId, tf, tag_weight):
         if token not in self.inverted_index:
             self.inverted_index[token] = []
-        self.inverted_index[token].append(Postings(filePath, url, docId, tf, df))
+        self.inverted_index[token].append(Postings(filePath, url, docId, tf, tag_weight))
 
 
     def createPartial(self):

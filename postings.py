@@ -1,9 +1,12 @@
 
 class Postings():
-    def __init__(self, docName, docId, tfidf):
-        self.docName = docName
+    def __init__(self, filePath, url, docId, tf, tag_weight):
+        self.docName = url
         self.docId = docId
-        self.tfidf = tfidf
+        self.tfidf = tf
+        self.filePath = filePath
+        self.tf = tf
+        self.tag_weight = tag_weight
 
     def getDocName(self):
         return self.docName
