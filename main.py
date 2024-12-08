@@ -115,9 +115,18 @@ def return_results(query):
 
 
     # break query into tokens
-    search_tokens = query.lower().split(" ")
-    search_tokens = { ps.stem(token) for token in search_tokens }
+    search_tokens = query.strip().lower().split(" ")
+    search_tokens = { ps.stem(token.strip()) for token in search_tokens }
    
+    print('search_tokens: ', search_tokens)
+    print('length of search_tokens: ', len(search_tokens))
+    if '' in search_tokens and len(search_tokens) == 1:
+        print('empty')
+        return [{"title": "No Results", "url": "N/A"}]
+    
+    if '' in search_tokens:
+        search_tokens.remove('')
+
 
 
     # keep each posting result in a different index so we can track intersection
