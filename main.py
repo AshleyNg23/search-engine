@@ -6,11 +6,19 @@ from nltk import PorterStemmer
 import math
 import os
 import time
+import re
 from functools import reduce
 from concurrent.futures import ThreadPoolExecutor
+from functools import lru_cache
+
+
 
 
 app = Flask(__name__)
+
+
+
+
 
 
 
@@ -20,6 +28,8 @@ def home():
     return render_template('search_home.html')
 
 
+
+
 @app.route('/search', methods=['POST', 'GET'])
 def search():
     query = request.form['query'] if request.method == 'POST' else request.args.get('query', '')  # Handle form and query params
@@ -27,15 +37,23 @@ def search():
     per_page = 10  # Number of results per page
 
 
+
+
     start_time = time.time()
+
+
 
 
     # Get all results based on the query
     all_results = return_results(query)
 
 
+
+
     end_time = time.time()
     elapsed_time = round((end_time - start_time) * 1000, 2)  # Convert to milliseconds
+
+
 
 
     # Calculate pagination
@@ -48,13 +66,19 @@ def search():
         paginated_results = all_results
 
 
+
+
     # Calculate total pages
     total_pages = math.ceil(len(all_results) / per_page)
+
+
 
 
     # Debugging output
     print(start_time, end_time, elapsed_time)
     print(f'{end_time} - {start_time} = {elapsed_time}')
+
+
 
 
     # Render the results template with pagination and other info
@@ -71,8 +95,13 @@ def search():
 
 
 
+
+
 def fetch_postings(token):
     """Fetch postings list for a token from the appropriate file."""
+    with open(f"term_seek_locations.pkl", "rb") as file:
+        data = pickle.load(file)
+        return
     file_path = f"IndexOfIndex/IndexesWith{token[0]}"
     if os.path.exists(file_path):
         with open(file_path, "rb") as file:
@@ -81,28 +110,45 @@ def fetch_postings(token):
     return []
 
 
+
+
 # Parallel processing for token lookups
 def get_matching_docs_parallel(search_tokens):
     matching_docs = []
-    with ThreadPoolExecutor() as executor:
-        # Map each token to the fetch_postings function
-        results = list(executor.map(fetch_postings, search_tokens))
-        matching_docs.append(results)
+    with open(f"term_seek_locations.pkl", "rb") as file:
+        data = pickle.load(file)
+        for tokens in search_tokens:
+            if tokens in data:
+                MergedIndex = open("MergedIndex.txt", "r", encoding = "utf-8")
+                MergedIndex.seek(data[tokens])
+                line = MergedIndex.readline()
+                matching_docs.append(line[len(tokens) + 1::].split(chr(0x1D)))
+            else:
+                matching_docs.append([])
     return matching_docs
 
 
+
+
 # Intersection of results
-# def find_total_sum(search_tokens):
-#     matching_docs = get_matching_docs_parallel(search_tokens)
-#     print(matching_docs)
-#     # Filter empty lists and find intersection
-#     results = {}
-#     for values in matching_docs[0]:
-#         if values.getDocId() in results:
-#             matching_docs[values.getDocId()] += values.getTfidf()
-#         else:
-#             matching_docs[values.getDocId()] = values.getTfidf()
-#     return results
+def find_total_sum(search_tokens):
+    matching_docs = get_matching_docs_parallel(search_tokens)
+    # Filter empty lists and find intersection
+    results = {}
+    for lists in matching_docs:
+        for values in lists:
+            value = values.split(" ")
+            if value[1] in results:
+                results[value[1]] += float(value[2])
+            else:
+                results[value[1]] = float(value[2])
+    return results
+
+
+
+
+
+
 
 
 
@@ -114,6 +160,8 @@ def return_results(query):
     ps = PorterStemmer()
 
 
+
+
     # break query into tokens
     search_tokens = query.strip().lower().split(" ")
     search_tokens = { ps.stem(token.strip()) for token in search_tokens }
@@ -123,9 +171,12 @@ def return_results(query):
     if '' in search_tokens and len(search_tokens) == 1:
         print('empty')
         return [{"title": "No Results", "url": "N/A"}]
-    
+   
     if '' in search_tokens:
         search_tokens.remove('')
+
+
+
 
 
 
@@ -134,14 +185,15 @@ def return_results(query):
    
     #Find if the tokens in the SEARCH QUERY are in our Index
     #IF not in file then append an empty list.
-    
-    intersection = get_matching_docs_parallel(search_tokens)
-    intersection=intersection[0]
-    #print(intersection)
-    intersection=tf_idf(intersection)
-    intersection=sorted(intersection,reverse=True)
+   
+    intersection = find_total_sum(search_tokens)
+    intersection = dict(sorted(intersection.items(), key=lambda item: item[1], reverse = True))
     end_time = time.time()
     print("Parallel Time:", end_time - start_time)
+    print(intersection)
+
+
+
 
                        
         # try:
@@ -165,14 +217,16 @@ def return_results(query):
         # except EOFError:
     if len(intersection) > 0:
         results = []
-        for inf in intersection:
-            url = inf.getDocName()
+        for docName, tfIDF in intersection.items():
+           
             # format title and url for front-end
-            results.append({"title": f"Doc Id: {inf.getDocId()} (TF-IDF: {inf.getTfidf():.4f})","url": url})
+            results.append({"title": f"(TF-IDF: {tfIDF:.4f})","url": docName})
         return results
     else:
         return [{"title": "No Results", "url": "N/A"}]
            
+
+
 
 
 # def convert_to_link(posting):
@@ -186,6 +240,8 @@ def return_results(query):
 #     return results
 
 
+
+
 def getUrl(docName):
     docName = docName.replace("\\", "/")
     with open(docName, "r") as docFile:
@@ -193,6 +249,8 @@ def getUrl(docName):
         url = data.get('url')
         docFile.close()
         return url
+
+
 
 
 def tf_idf(matching_docs):
@@ -206,6 +264,12 @@ def tf_idf(matching_docs):
     for s in matching_docs:
         union_set=union_set.union(s)
     return union_set
+
+
+
+
+
+
 
 
 
