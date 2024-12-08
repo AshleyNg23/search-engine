@@ -45,5 +45,9 @@ def main(dir_name):
 
 
 if __name__ == "__main__":
+<<<<<<< HEAD
     main(r"F:\CompSci 121\cs-121-search-engine-5\DEV")
+=======
+    main("DEV")
+>>>>>>> da426cd933e6ac61c2531b0db542d674b7d00fa9
 

@@ -1,5 +1,9 @@
 from postings import Postings
+<<<<<<< HEAD
 from tokenizer import tokenizer, computeWordFrequencies
+=======
+from tokenizer import tokenizer
+>>>>>>> da426cd933e6ac61c2531b0db542d674b7d00fa9
 import os
 from bs4 import BeautifulSoup
 import re
@@ -44,16 +48,33 @@ class Index(object):
                 soup = BeautifulSoup(html_content["content"], "lxml")
                 soup1 = BeautifulSoup(html_content["url"],"lxml")
                 text = soup.get_text()
+<<<<<<< HEAD
                 #space_delemited_text = re.sub(r'\s+',' ',text)
+=======
+>>>>>>> da426cd933e6ac61c2531b0db542d674b7d00fa9
                 #Get url for faster finding in the search
                 url = soup1.get_text()
                 space_delemited_url = re.sub(r'\s+',' ',url)
                 # Now you can use BeautifulSoup methods to extract data from the file
                 # For example, to get all the links:
+<<<<<<< HEAD
 
 
                 # tokens = tokenizer(space_delemited_text)
                 # freq = computeWordFrequencies(tokens)
+=======
+                word_tag_freq = defaultdict(list)
+                for htmltag in soup.descendants:
+                    if htmltag.name and htmltag.string: 
+                        text = htmltag.get_text()
+                        space_delimited_text = re.sub(r'\s+', ' ', text)
+                        tokens = tokenizer(space_delimited_text)  # Tokenize the text
+                        for token in tokens:
+                            if htmltag.name == "h1" or htmltag.name == "h2" or htmltag.name == "h3" or htmltag.name == "bold" or htmltag.name == "strong" or htmltag.name == "title":
+                                word_tag_freq[token].append(1.25)
+                            else:
+                                word_tag_freq[token].append(1)
+>>>>>>> da426cd933e6ac61c2531b0db542d674b7d00fa9
 
                 word_tag_freq = defaultdict(list)
                 for htmltag in soup.descendants:
@@ -68,8 +89,11 @@ class Index(object):
                                 word_tag_freq[token].append(1)
                 # Duplication/Similiarity Check
                 # Iterate through the tokens to log them into our inverted Index O(N) run-time O(N) space comp
+<<<<<<< HEAD
                 # for key,values in freq.items():
                 #         self.logTokens(filePath, space_delemited_url, key, self.currentDocId, 1 + math.log(values, 10) ,values)
+=======
+>>>>>>> da426cd933e6ac61c2531b0db542d674b7d00fa9
                 for key,tag_weight in word_tag_freq.items():
                         term_freq = len(tag_weight) 
                         self.logTokens(filePath, space_delemited_url, key, self.currentDocId, 1 + math.log(term_freq, 10) , max(tag_weight))
@@ -78,8 +102,6 @@ class Index(object):
                             self.createPartial()
                             self.chunk = 0
                 self.currentDocId += 1
-               
-               
         self.createPartial()
         self.mergePartial()
            
