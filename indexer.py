@@ -116,8 +116,8 @@ class Index(object):
             else:
                 #Check to see if the currentTerm is not None
                 if currentTerm != None:
-                    for posts in currentPostings:
-                        posts.setTfidf(math.log(self.currentDocId/len(currentPostings),10)) #Set the tfIDF value for this posts
+                    # for posts in currentPostings:
+                    #     posts.setTfidf(math.log(self.currentDocId/len(currentPostings),10)) #Set the tfIDF value for this posts
                     mergedIndex[currentTerm] = currentPostings
                
                 #Keep track of the amount of unique tokens so we don't have to open the file to check.            

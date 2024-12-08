@@ -92,16 +92,17 @@ def get_matching_docs_parallel(search_tokens):
 
 
 # Intersection of results
-def find_total_sum(search_tokens):
-    matching_docs = get_matching_docs_parallel(search_tokens)
-    # Filter empty lists and find intersection
-    results = {}
-    for values in matching_docs[0]:
-        if values.getDocId() in results:
-            matching_docs[values.getDocId()] += values.getTfidf()
-        else:
-            matching_docs[values.getDocId()] = values.getTfidf()
-    return results
+# def find_total_sum(search_tokens):
+#     matching_docs = get_matching_docs_parallel(search_tokens)
+#     print(matching_docs)
+#     # Filter empty lists and find intersection
+#     results = {}
+#     for values in matching_docs[0]:
+#         if values.getDocId() in results:
+#             matching_docs[values.getDocId()] += values.getTfidf()
+#         else:
+#             matching_docs[values.getDocId()] = values.getTfidf()
+#     return results
 
 
 
@@ -124,10 +125,14 @@ def return_results(query):
    
     #Find if the tokens in the SEARCH QUERY are in our Index
     #IF not in file then append an empty list.
+    
+    intersection = get_matching_docs_parallel(search_tokens)
+    intersection=intersection[0]
+    #print(intersection)
+    intersection=tf_idf(intersection)
+    intersection=sorted(intersection,reverse=True)
     end_time = time.time()
     print("Parallel Time:", end_time - start_time)
-    intersection = find_total_sum(search_tokens)
-
 
                        
         # try:
@@ -152,7 +157,7 @@ def return_results(query):
     if len(intersection) > 0:
         results = []
         for inf in intersection:
-            url = inf.getUrl()
+            url = inf.getDocName()
             # format title and url for front-end
             results.append({"title": f"Doc Id: {inf.getDocId()} (TF-IDF: {inf.getTfidf():.5f})","url": url})
         return results
@@ -172,24 +177,25 @@ def return_results(query):
 #     return results
 
 
-# def getUrl(docName):
-#     docName = docName.replace("\\", "/")
-#     with open(docName, "r") as docFile:
-#         data = json.load(docFile)
-#         url = data.get('url')
-#         docFile.close()
-#         return url
+def getUrl(docName):
+    docName = docName.replace("\\", "/")
+    with open(docName, "r") as docFile:
+        data = json.load(docFile)
+        url = data.get('url')
+        docFile.close()
+        return url
 
 
-# def tf_idf(matching_docs):
-#     for i in matching_docs:
-#         for j in i:
-#             tf=(1+math.log(j.getTfidf(),10))*math.log(55394/len(i),10)
-#             j.setTfidf(tf)
-#     union_set=set()
-#     for s in matching_docs:
-#         union_set=union_set.union(s)
-#     return union_set
+def tf_idf(matching_docs):
+    for i in matching_docs:
+        for j in i:
+            # print(j.getTfidf())
+            tf=(1+math.log(j.getTfidf(),10))*math.log(55394/len(i),10)
+            j.setTfidf(tf)
+    union_set=set()
+    for s in matching_docs:
+        union_set=union_set.union(s)
+    return union_set
 
 
 
