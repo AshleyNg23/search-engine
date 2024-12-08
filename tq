@@ -1,0 +1,217 @@
+[33mcommit ec271aa875d0a354a9e57417fceab130959f371e[m[33m ([m[1;36mHEAD[m[33m, [m[1;31morigin/rudy-changes[m[33m)[m
+Author: Leo Siu <leonardoy.siu@gmail.com>
+Date:   Sat Dec 7 21:57:34 2024 -0800
+
+    fix for whitespace in between tokens edge case
+
+[33mcommit 810618ccf8e89cbe91c7cb1d37df516660aec8a4[m
+Author: Ashley Nguyen <ashleynguyen032@gmail.com>
+Date:   Sat Dec 7 21:12:26 2024 -0800
+
+    styling changes
+
+[33mcommit 8a5ef2173bab12e32ef53d466daa76f35792608b[m
+Merge: 6785f0e bc17e34
+Author: Ashley Nguyen <ashleynguyen032@gmail.com>
+Date:   Sat Dec 7 21:04:37 2024 -0800
+
+    Merge branch 'rudy-changes' of https://github.com/AshleyN23/cs-121-search-engine into rudy-changes
+
+[33mcommit 6785f0ed664300d7e7654c0aa619f52b434d7064[m
+Merge: da426cd 4f18aa8
+Author: Ashley Nguyen <ashleynguyen032@gmail.com>
+Date:   Sat Dec 7 20:59:16 2024 -0800
+
+    Merge branch 'rudy-changes' of https://github.com/AshleyN23/cs-121-search-engine into rudy-changes
+
+[33mcommit bc17e34f06b2490006f6c01e0615595223e97870[m
+Merge: 4f18aa8 da426cd
+Author: Muye <muyec1@uci.edu>
+Date:   Sat Dec 7 20:56:50 2024 -0800
+
+    tag_weight as tf-idf factor
+
+[33mcommit 4f18aa896a61f2a27a7f8c22f9957b493392e730[m
+Author: Muye <muyec1@uci.edu>
+Date:   Sat Dec 7 20:42:32 2024 -0800
+
+    debug
+
+[33mcommit da426cd933e6ac61c2531b0db542d674b7d00fa9[m
+Author: Ashley Nguyen <ashleynguyen032@gmail.com>
+Date:   Sat Dec 7 20:29:18 2024 -0800
+
+    updated w/ tag weight and removed stop words
+
+[33mcommit 539cb7612367bc6fda03786a583452d3279fbbe0[m
+Author: Rudy Xie <rudy11923@gmail.com>
+Date:   Sat Dec 7 19:43:13 2024 -0800
+
+    Copy/Paste branch
+
+[33mcommit baffc103a40977b7ac86110dec1cd17ca1c9a273[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: Muye <muyec1@uci.edu>
+Date:   Fri Dec 6 04:21:37 2024 -0800
+
+    works for one term now
+
+[33mcommit 6d0e44fe8fff1a1f6d710ac6a996c2034bad9fc1[m
+Author: Leo Siu <leonardoy.siu@gmail.com>
+Date:   Thu Dec 5 23:49:49 2024 -0800
+
+    add pagination to ui and modify post search post request to work with pagination
+
+[33mcommit 2af4a407f60e4224d5b0e5559b5ac2a904ea7540[m
+Author: Muye <muyec1@uci.edu>
+Date:   Mon Dec 2 07:41:25 2024 -0800
+
+    Make the search engine faster
+
+[33mcommit 3482e132c3de63622e5ff54e5549f62450f2ae87[m
+Author: Muye <muyec1@uci.edu>
+Date:   Mon Dec 2 00:01:14 2024 -0800
+
+    calculate the tf-idf
+
+[33mcommit ab0e5cf5c798baa60fff896a174ffd2dd191aa65[m
+Merge: 50e0e18 79a01b0
+Author: AshleyN23 <104221476+AshleyN23@users.noreply.github.com>
+Date:   Sun Dec 1 15:13:36 2024 -0800
+
+    Merge pull request #1 from AshleyN23/query-interface
+    
+    Query interface
+
+[33mcommit 79a01b0ff1b4aea5aaec0a7fa32dbdd4d146f9f5[m[33m ([m[1;32mquery-interface[m[33m)[m
+Author: AshleyN23 <104221476+AshleyN23@users.noreply.github.com>
+Date:   Fri Nov 22 18:01:37 2024 -0800
+
+    report
+
+[33mcommit 91affb3fb25a486a84ef5af9bb622f181fddc53d[m[33m ([m[1;31morigin/query-interface[m[33m)[m
+Author: Muye <muyec1@uci.edu>
+Date:   Fri Nov 22 05:31:31 2024 -0800
+
+    implement method to sort posting
+
+[33mcommit 9cd107b3d2b31c17babf1c4fd9e9ffe057194e19[m
+Author: Muye <muyec1@uci.edu>
+Date:   Fri Nov 22 01:16:14 2024 -0800
+
+    Use the lowest tfidf as document tdifd
+
+[33mcommit 83ec7bc821e1abe94c4dd399805ec0706eab366f[m
+Author: Leo Siu <leonardoy.siu@gmail.com>
+Date:   Thu Nov 21 22:53:39 2024 -0800
+
+    add button to go to bottom for ui, implement porter stemming for query terms before processing / searching, revise and truncate return_results function
+
+[33mcommit d027226a70ee1fa04a65dc09345069ecd8923dd6[m
+Author: Muye <muyec1@uci.edu>
+Date:   Thu Nov 21 05:04:39 2024 -0800
+
+    work for basic "and"
+
+[33mcommit 827ea3604adea1cc3c4dfa97d303f3db14b02314[m
+Author: Ashley Nguyen <ashleynguyen032@gmail.com>
+Date:   Wed Nov 20 22:26:20 2024 -0800
+
+    implemented front end+single word search
+
+[33mcommit dbd97b5cfafeb492b3181343eb057f0cf64361ac[m
+Author: Ashley Nguyen <ashleynguyen032@gmail.com>
+Date:   Wed Nov 20 20:18:38 2024 -0800
+
+    added web interface
+
+[33mcommit 50e0e183e366c4379eaebe5de4f8e54ea0ac24b2[m
+Author: AshleyN23 <104221476+AshleyN23@users.noreply.github.com>
+Date:   Fri Nov 15 20:43:05 2024 -0800
+
+    Add files via upload
+
+[33mcommit 4311c73866338f7ebf3643ab2a3ff568baf5adc5[m
+Author: AshleyN23 <104221476+AshleyN23@users.noreply.github.com>
+Date:   Fri Nov 15 11:01:02 2024 -0800
+
+    added pdf report
+    
+    https://docs.google.com/document/d/1ftOdl8AH5a7VC6QXdyqdGAnAfzUKCI9wtQVUr8JRP-A/edit?usp=sharing
+
+[33mcommit cf20737fdf6d66c3ee28d084664b06f236b34104[m
+Author: Ashley Nguyen <ashleynguyen032@gmail.com>
+Date:   Fri Nov 15 10:52:49 2024 -0800
+
+    deleted comments
+
+[33mcommit 8dc40d04752f59174939e51e61ac43632984a50f[m[33m ([m[1;32mmain[m[33m)[m
+Author: Rudy Xie <rudyx@uci.edu>
+Date:   Thu Nov 14 18:21:48 2024 -0800
+
+    Implemented Partial Indexing
+
+[33mcommit 872d4c3396c86e9dc45799488343b3e79af5355e[m
+Author: Muye <muyec1@uci.edu>
+Date:   Sun Nov 10 20:05:44 2024 -0800
+
+    fix typo
+
+[33mcommit 11aadbf94a6d66bc5fe482619175c83266a9cc5f[m
+Author: Muye <muyec1@uci.edu>
+Date:   Sun Nov 10 20:04:46 2024 -0800
+
+    index size in memory measured in kb
+
+[33mcommit 4948d5ef5232f3d92088e0ba46be83182bad6f5c[m
+Author: Muye <muyec1@uci.edu>
+Date:   Sun Nov 10 16:43:03 2024 -0800
+
+    output the size in memory but not disk
+
+[33mcommit e37d2addbc5869b3d82849dac5e34b2a3a3c944f[m
+Author: Muye <muyec1@uci.edu>
+Date:   Sun Nov 10 16:18:12 2024 -0800
+
+    fix some small bug
+
+[33mcommit 2f0d9ee5c8b7b5abc9077dceb42a261bf0a75685[m
+Author: Rudy Xie <rudyx@uci.edu>
+Date:   Sat Nov 9 21:16:41 2024 -0800
+
+    Fixed issues with the folders and parser
+
+[33mcommit 5c371001a3510070f1f3ea4d8ab4dbf87b20011e[m
+Author: Rudy Xie <rudyx@uci.edu>
+Date:   Sat Nov 9 21:01:33 2024 -0800
+
+    Implemented the Inverted List Structure.
+
+[33mcommit ea1b4507547ba721fbdba227f37be4685d7e6335[m
+Author: Rudy Xie <rudyx@uci.edu>
+Date:   Sat Nov 9 12:33:56 2024 -0800
+
+    Added in test files from assignment
+
+[33mcommit a91e8ce7862b6f2edfe52fabb4fc6237b79155c9[m
+Author: Rudy Xie <rudyx@uci.edu>
+Date:   Sat Nov 9 00:08:02 2024 -0800
+
+    First commit. Added a posting  Class to keep track of the docId ,tfidf, and fields of the documents
+
+[33mcommit 926d1fe1a0267c640fc09eb86664e196f4c6f8e9[m
+Author: Leo Siu <leonardoy.siu@gmail.com>
+Date:   Fri Nov 8 20:54:46 2024 -0800
+
+    reuse tokenizer and compute word frequencies functions
+
+[33mcommit f6623a9649b4eed45541cc24f4f3ac3d877ea38d[m
+Author: Ashley Nguyen <ashleynguyen032@gmail.com>
+Date:   Fri Nov 8 20:53:05 2024 -0800
+
+    added some pseudocode + structure
+
+[33mcommit e3b855a674afd03e1fd1df7f6cce5b0509a9070c[m
+Author: Ashley Nguyen <ashleynguyen032@gmail.com>
+Date:   Fri Nov 8 20:37:03 2024 -0800
+
+    base class and main??? subject to change
