@@ -19,6 +19,9 @@ class Postings():
     
     def setTfidf(self,value):
         self.tfidf=value
+
+    def getWeight(self):
+        return self.tag_weight
     
     def __eq__(self, value):
         if isinstance(value, Postings):

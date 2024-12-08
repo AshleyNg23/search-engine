@@ -191,6 +191,7 @@ def tf_idf(matching_docs):
         for j in i:
             # print(j.getTfidf())
             tf=(1+math.log(j.getTfidf(),10))*math.log(55394/len(i),10)
+            tf=tf*j.getWeight()
             j.setTfidf(tf)
     union_set=set()
     for s in matching_docs:
