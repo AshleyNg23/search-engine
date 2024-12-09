@@ -24,7 +24,7 @@
     <div class="position-absolute top-0 my-5 start-50 translate-middle-x">
         <h1>Search Results for "{{ query }}"</h1>
         <p class="text-muted">Found {{ num_results }} result{{ num_results != 1 and 's' or '' }}</p>
-        <p class="text-muted">Query processed in {{ elapsed_time }} milliseconds.</p>
+        <p class="text-muted">Query processed in {{ elapsed_time }} ms.</p>
 
         {% for result in results %}
         <div class="mb-3">
