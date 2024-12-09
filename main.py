@@ -95,8 +95,6 @@ def search():
 
 
 
-
-
 def fetch_postings(token):
     """Fetch postings list for a token from the appropriate file."""
     with open(f"term_seek_locations.pkl", "rb") as file:
@@ -115,17 +113,30 @@ def fetch_postings(token):
 # Parallel processing for token lookups
 def get_matching_docs_parallel(search_tokens):
     matching_docs = []
-    with open(f"term_seek_locations.pkl", "rb") as file:
-        data = pickle.load(file)
-        for tokens in search_tokens:
+    MergedIndex = open("MergedIndex.txt", "r", encoding = "utf-8")
+    for tokens in search_tokens:
+        with open(f"IndexOfIndex/term_seek_locations_{tokens[0]}.pkl", "rb") as file:
+            data = pickle.load(file)
             if tokens in data:
-                MergedIndex = open("MergedIndex.txt", "r", encoding = "utf-8")
                 MergedIndex.seek(data[tokens])
                 line = MergedIndex.readline()
                 matching_docs.append(line[len(tokens) + 1::].split(chr(0x1D)))
             else:
                 matching_docs.append([])
     return matching_docs
+            
+
+    # with open(f"term_seek_locations.pkl", "rb") as file:
+    #     data = pickle.load(file)
+    #     for tokens in search_tokens:
+    #         if tokens in data:
+    #             MergedIndex = open("MergedIndex.txt", "r", encoding = "utf-8")
+    #             MergedIndex.seek(data[tokens])
+    #             line = MergedIndex.readline()
+    #             matching_docs.append(line[len(tokens) + 1::].split(chr(0x1D)))
+    #         else:
+    #             matching_docs.append([])
+    # return matching_docs
 
 
 
@@ -166,10 +177,7 @@ def return_results(query):
     search_tokens = query.strip().lower().split(" ")
     search_tokens = { ps.stem(token.strip()) for token in search_tokens }
    
-    print('search_tokens: ', search_tokens)
-    print('length of search_tokens: ', len(search_tokens))
     if '' in search_tokens and len(search_tokens) == 1:
-        print('empty')
         return [{"title": "No Results", "url": "N/A"}]
    
     if '' in search_tokens:
@@ -190,7 +198,6 @@ def return_results(query):
     intersection = dict(sorted(intersection.items(), key=lambda item: item[1], reverse = True))
     end_time = time.time()
     print("Parallel Time:", end_time - start_time)
-    print(intersection)
 
 
 
@@ -238,32 +245,6 @@ def return_results(query):
 #         # format title and url for front-end
 #         results.append({"title": f"Doc Id: {post.getDocId()}", "url": f"{url}"})
 #     return results
-
-
-
-
-def getUrl(docName):
-    docName = docName.replace("\\", "/")
-    with open(docName, "r") as docFile:
-        data = json.load(docFile)
-        url = data.get('url')
-        docFile.close()
-        return url
-
-
-
-
-def tf_idf(matching_docs):
-    for i in matching_docs:
-        for j in i:
-            # print(j.getTfidf())
-            tf=(1+math.log(j.getTfidf(),10))*math.log(55394/len(i),10)
-            tf=tf*j.getWeight()
-            j.setTfidf(tf)
-    union_set=set()
-    for s in matching_docs:
-        union_set=union_set.union(s)
-    return union_set
 
 
 

@@ -92,41 +92,64 @@ class Index(object):
             with open(f"PartialIndex{i}.pkl", "rb") as file:
                 while True:
                     try:
-                        token,postings = pickle.load(file)
+                        token, postings = pickle.load(file)
                         heapq.heappush(heap, (token, i, postings))
                     except EOFError:
                         break
-       
+
         currentTerm = None
         currentPostings = []
         currentLetter = None
-        with open("MergedIndex.txt", "w", encoding = "utf-8") as output_file:
-            seek_locations = {}
+        seek_locations = {}
+
+        output_directory = "IndexOfIndex"
+        os.makedirs(output_directory, exist_ok=True)
+        
+        with open("MergedIndex.txt", "w", encoding="utf-8") as output_file:
             seek_position = output_file.tell()
-           
+
             while heap:
                 term, fileIndex, postings = heapq.heappop(heap)
+                first_letter = term[0].lower()  # Determine the first letter of the term (case-insensitive)
+
                 if term == currentTerm:
                     currentPostings.extend(postings)
                 else:
                     if currentTerm is not None:
-                        posting_str = chr(0x1D).join(f"{post.docId} {post.docName} {post.getTfidf(math.log(self.currentDocId/len(currentPostings), 10))} {post.tag_weight}" for post in currentPostings)
+                        # Write the postings for the current term
+                        posting_str = chr(0x1D).join(
+                            f"{post.docId} {post.docName} {post.getTfidf(math.log(self.currentDocId / len(currentPostings), 10))} {post.tag_weight}"
+                            for post in currentPostings
+                        )
                         output_file.write(f"{currentTerm} {posting_str}\n")
                         seek_locations[currentTerm] = seek_position
                         seek_position = output_file.tell()
-                   
+
+                    # If the first letter of the term changes, dump the current seek_locations to a file
+                    if currentLetter != first_letter:
+                        if currentLetter is not None:
+                            with open(f"IndexOfIndex/term_seek_locations_{currentLetter}.pkl", "wb") as seek_file:
+                                pickle.dump(seek_locations, seek_file)
+                        # Reset seek_locations for the new letter
+                        seek_locations = {}
+                        currentLetter = first_letter
+
                     currentPostings = postings
                     currentTerm = term
-               
-           
+
             # Dump the final term and its postings
-            posting_str = chr(0x1D).join(f"{post.docId} {post.docName} {post.tf} {post.tag_weight}" for post in currentPostings)
+            posting_str = chr(0x1D).join(
+                f"{post.docId} {post.docName} {post.tf} {post.tag_weight}"
+                for post in currentPostings
+            )
             output_file.write(f"{currentTerm},{posting_str}\n")
             seek_locations[currentTerm] = seek_position
-       
-        # Store seek locations in a pickle file
-        with open("term_seek_locations.pkl", "wb") as seek_file:
-            pickle.dump(seek_locations, seek_file)
+
+            # Dump the last seek_locations to a file
+            if currentLetter is not None:
+                with open(f"IndexOfIndex/term_seek_locations_{currentLetter}.pkl", "wb") as seek_file:
+                    pickle.dump(seek_locations, seek_file)
+
 
 
 
