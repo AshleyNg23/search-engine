@@ -105,22 +105,23 @@ class Index(object):
                 T[i]=T[i]/s
         B = np.ones(np.shape(url_matrix))
         B=(1/m)*B
-        G = (1-0.15)*T+0.15*B
-        assert np.all(np.abs(T.sum(axis=1) - 1.0) < 1e-12)
-        assert np.all(np.abs(G.sum(axis=1) - 1.0) < 1e-12)
+        G = (1-0.15)*T
+        # assert np.all(np.abs(T.sum(axis=1) - 1.0) < 1e-12)
+        # assert np.all(np.abs(G.sum(axis=1) - 1.0) < 1e-12)
         m = np.shape(G)[0]
         #print(P)
         pi = np.ones(m) / m
         #print(pi)
-        diff = np.zeros(100)
+        diff = np.zeros(10000)
         #P=P.T
-        for i in range(100):
+        for i in range(10000):
             #print(np.shape(pi))
             #P=P.T
-            pi_n=pi@G
+            pi_n=pi@G+0.15
             #pi_n=np.linalg.solve(pi_n, temp)
             diff[i] = np.sum(np.abs(pi_n - pi))
-            if i>=1 and diff[i]-diff[i-1] < epsilon:
+            if diff[i] < epsilon:
+                print('early_stop',i)
                 pi=pi_n
                 return pi
             pi=pi_n
