@@ -152,10 +152,10 @@ def find_total_sum(search_tokens):
             value = values.split(" ")
             if value[1] in results:
                 results[value[1]] += float(value[2])
-                results[value[1]] += float(value[4])
+                # results[value[1]] += float(value[4])
             else:
                 results[value[1]] = float(value[2])
-                results[value[1]] += float(value[4])
+                # results[value[1]] += float(value[4])
     return results
 
 
