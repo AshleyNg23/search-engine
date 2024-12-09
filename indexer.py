@@ -76,6 +76,7 @@ class Index(object):
                             self.chunk += 1
                             if self.chunk >= self.chunkSize:
                                 self.createPartial()
+                                self.simHashes = set()
                                 self.chunk = 0
                     self.currentDocId += 1
         self.PR=self.pagerank()
