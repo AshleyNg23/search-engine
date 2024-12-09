@@ -8,6 +8,7 @@ from tokenizer import tokenizer
 from bs4 import BeautifulSoup
 import re
 import json
+import numpy as np
 
 
 
@@ -21,6 +22,9 @@ class Index(object):
         self.currentDocId = 1
         self.amountOfPartial = 0
         self.chunkSize = 100000
+        self.url_list = {}
+        self.PR=[]
+        self.url=[]
 
 
 
@@ -40,6 +44,15 @@ class Index(object):
                 text = soup.get_text()
                 url = soup1.get_text()
                 space_delemited_url = re.sub(r'\s+',' ',url)
+                for link in soup.find_all('a'):
+                    if link.get('href'):
+                        l=re.sub(r'\s+',' ',link.get('href'))
+                        if space_delemited_url in self.url_list:
+                            self.url_list[space_delemited_url].append(l)
+                        else:
+                            self.url_list[space_delemited_url]=[l]
+                if space_delemited_url not in self.url_list:
+                    self.url_list[space_delemited_url]=[]
                 word_tag_freq = defaultdict(list)
                 for htmltag in soup.descendants:
                     if htmltag.name and htmltag.string:
@@ -61,11 +74,53 @@ class Index(object):
                             self.createPartial()
                             self.chunk = 0
                 self.currentDocId += 1
+        self.PR=self.pagerank()
         self.createPartial()
         self.mergePartial()
 
 
-
+    def pagerank(self):
+        self.url = list(self.url_list.keys())
+        url_matrix = np.zeros((len(self.url), len(self.url)))
+        for i, url in enumerate(self.url):
+            for linked_url in self.url_list[url]:
+                if linked_url in self.url:
+                    j = self.url.index(linked_url)
+                    url_matrix[i, j] = 1
+        m = np.shape(url_matrix)[0]
+        epsilon=1e-12
+        T = url_matrix.copy()
+        for i in range(m):
+            s = np.sum(T[i])
+            # Normalize by the number of outgoing links to create transition probabilities
+            # For websites with no outgoing links, set T[i,i]=1
+            if s==0:
+                T[i][i]=1
+            else:
+                T[i]=T[i]/s
+        B = np.ones(np.shape(url_matrix))
+        B=(1/m)*B
+        G = (1-0.15)*T+0.15*B
+        assert np.all(np.abs(T.sum(axis=1) - 1.0) < 1e-12)
+        assert np.all(np.abs(G.sum(axis=1) - 1.0) < 1e-12)
+        m = np.shape(G)[0]
+        #print(P)
+        pi = np.ones(m) / m
+        #print(pi)
+        diff = np.zeros(100)
+        #P=P.T
+        for i in range(100):
+            #print(np.shape(pi))
+            #P=P.T
+            pi_n=pi@G
+            #pi_n=np.linalg.solve(pi_n, temp)
+            diff[i] = np.sum(np.abs(pi_n - pi))
+            if i>=1 and diff[i]-diff[i-1] < epsilon:
+                pi=pi_n
+                return pi
+            pi=pi_n
+            #print(pi)
+        return pi
 
     def logTokens(self, filePath, url, token, docId, tf, tag_weight):
         if token not in self.inverted_index:
@@ -118,7 +173,7 @@ class Index(object):
                     if currentTerm is not None:
                         # Write the postings for the current term
                         posting_str = chr(0x1D).join(
-                            f"{post.docId} {post.docName} {post.getTfidf(math.log(self.currentDocId / len(currentPostings), 10))} {post.tag_weight}"
+                            f"{post.docId} {post.docName} {post.getTfidf(math.log(self.currentDocId / len(currentPostings), 10))} {post.tag_weight} {self.PR[self.url.index(post.docName)]}"
                             for post in currentPostings
                         )
                         output_file.write(f"{currentTerm} {posting_str}\n")
