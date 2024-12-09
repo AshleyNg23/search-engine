@@ -4,7 +4,7 @@ import math
 import heapq
 from collections import defaultdict
 from postings import Postings
-from tokenizer import tokenizer
+from tokenizer import tokenizer, computeSimHashFrequencies, checkSimilar, simHash
 from bs4 import BeautifulSoup
 import re
 import json
@@ -42,38 +42,42 @@ class Index(object):
                 soup = BeautifulSoup(html_content["content"], "lxml")
                 soup1 = BeautifulSoup(html_content["url"], "lxml")
                 text = soup.get_text()
-                url = soup1.get_text()
-                space_delemited_url = re.sub(r'\s+',' ',url)
-                for link in soup.find_all('a'):
-                    if link.get('href'):
-                        l=re.sub(r'\s+',' ',link.get('href'))
-                        if space_delemited_url in self.url_list:
-                            self.url_list[space_delemited_url].append(l)
-                        else:
-                            self.url_list[space_delemited_url]=[l]
-                if space_delemited_url not in self.url_list:
-                    self.url_list[space_delemited_url]=[]
-                word_tag_freq = defaultdict(list)
-                for htmltag in soup.descendants:
-                    if htmltag.name and htmltag.string:
-                        text = htmltag.get_text()
-                        space_delimited_text = re.sub(r'\s+', ' ', text)
-                        tokens = tokenizer(space_delimited_text)
-                        for token in tokens:
-                            if htmltag.name in ["h1", "h2", "h3", "bold", "strong", "title"]:
-                                word_tag_freq[token].append(1.25)
+                #Similarity check with SimHash
+                sh = simHash(computeSimHashFrequencies(tokenizer(text)))
+                if not checkSimilar(self.simHashes, sh):
+                    self.simHashes.add(sh)
+                    url = soup1.get_text()
+                    space_delemited_url = re.sub(r'\s+',' ',url)
+                    for link in soup.find_all('a'):
+                        if link.get('href'):
+                            l=re.sub(r'\s+',' ',link.get('href'))
+                            if space_delemited_url in self.url_list:
+                                self.url_list[space_delemited_url].append(l)
                             else:
-                                word_tag_freq[token].append(1)
+                                self.url_list[space_delemited_url]=[l]
+                    if space_delemited_url not in self.url_list:
+                        self.url_list[space_delemited_url]=[]
+                    word_tag_freq = defaultdict(list)
+                    for htmltag in soup.descendants:
+                        if htmltag.name and htmltag.string:
+                            text = htmltag.get_text()
+                            space_delimited_text = re.sub(r'\s+', ' ', text)
+                            tokens = tokenizer(space_delimited_text)
+                            for token in tokens:
+                                if htmltag.name in ["h1", "h2", "h3", "bold", "strong", "title"]:
+                                    word_tag_freq[token].append(1.25)
+                                else:
+                                    word_tag_freq[token].append(1)
 
 
-                for key,tag_weight in word_tag_freq.items():
-                        term_freq = len(tag_weight)
-                        self.logTokens(filePath, space_delemited_url, key, self.currentDocId, 1 + math.log(term_freq, 10) , max(tag_weight))
-                        self.chunk += 1
-                        if self.chunk >= self.chunkSize:
-                            self.createPartial()
-                            self.chunk = 0
-                self.currentDocId += 1
+                    for key,tag_weight in word_tag_freq.items():
+                            term_freq = len(tag_weight)
+                            self.logTokens(filePath, space_delemited_url, key, self.currentDocId, 1 + math.log(term_freq, 10) , max(tag_weight))
+                            self.chunk += 1
+                            if self.chunk >= self.chunkSize:
+                                self.createPartial()
+                                self.chunk = 0
+                    self.currentDocId += 1
         self.PR=self.pagerank()
         self.createPartial()
         self.mergePartial()
