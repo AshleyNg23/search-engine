@@ -115,14 +115,15 @@ def get_matching_docs_parallel(search_tokens):
     matching_docs = []
     MergedIndex = open("MergedIndex.txt", "r", encoding = "utf-8")
     for tokens in search_tokens:
-        with open(f"IndexOfIndex/term_seek_locations_{tokens[0]}.pkl", "rb") as file:
-            data = pickle.load(file)
-            if tokens in data:
-                MergedIndex.seek(data[tokens])
-                line = MergedIndex.readline()
-                matching_docs.append(line[len(tokens) + 1::].split(chr(0x1D)))
-            else:
-                matching_docs.append([])
+        if os.path.exists(f"IndexOfIndex/term_seek_locations_{tokens[0]}.pkl"):
+            with open(f"IndexOfIndex/term_seek_locations_{tokens[0]}.pkl", "rb") as file:
+                data = pickle.load(file)
+                if tokens in data:
+                    MergedIndex.seek(data[tokens])
+                    line = MergedIndex.readline()
+                    matching_docs.append(line[len(tokens) + 1::].split(chr(0x1D)))
+                else:
+                    matching_docs.append([])
     return matching_docs
             
 
